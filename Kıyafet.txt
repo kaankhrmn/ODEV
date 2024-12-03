@@ -1,0 +1,66 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+// API'den yağmur verisini çekme
+Future<bool> fetchRainData() async {
+  // Balıkesir için hava durumu API'si (örnek)
+  String apiUrl = 'https://api.openweathermap.org/data/2.5/weather?q=Balıkesir&appid=YOUR_API_KEY';
+  
+  // API'den veri çekme
+  final response = await http.get(Uri.parse(apiUrl));
+
+  if (response.statusCode == 200) {
+    // API'den dönen veriyi çözümle
+    var data = json.decode(response.body);
+    // Yağmur durumu var mı?
+    return data['weather'][0]['main'] == 'Rain';
+  } else {
+    throw Exception('Hava durumu verisi çekilemedi');
+  }
+}
+
+// Kıyafet önerisi algoritması
+String getClothingSuggestion(double temperature, bool isRaining, double windSpeed) {
+  String clothingRecommendation = '';
+
+  // Sıcaklık önerileri
+  if (temperature <= 10) {
+    clothingRecommendation += 'Soğuk hava, mont giymelisiniz.';
+  } else if (temperature > 10 && temperature <= 20) {
+    clothingRecommendation += 'Hafif soğuk, kazak veya hırka önerilir.';
+  } else if (temperature > 20 && temperature <= 30) {
+    clothingRecommendation += 'Sıcak hava, tişört giymelisiniz.';
+  } else {
+    clothingRecommendation += 'Çok sıcak, şort ve tişört önerilir.';
+  }
+
+  // Yağmur varsa, bot ve şemsiye önerisi ekle
+  if (isRaining) {
+    clothingRecommendation += ' Ayrıca, yağmur nedeniyle bot ve şemsiye almanızı öneririm.';
+  }
+
+  // Rüzgar varsa, rüzgarlık veya mont önerisi ekle
+  if (windSpeed > 5) {
+    clothingRecommendation += ' Ayrıca, rüzgar nedeniyle rüzgarlık veya mont giymeniz iyi olabilir.';
+  }
+
+  return clothingRecommendation;
+}
+
+void main() async {
+  // Örnek sıcaklık ve rüzgar hızı
+  double calculatedTemperature = 15.0; // Önceki algoritmadan gelen sıcaklık değeri
+  double windSpeed = 4.5; // Rüzgar hızı
+
+  // Yağmur durumunu API'den al
+  bool isRaining = await fetchRainData();
+
+  // Kıyafet önerisini al
+  String clothingSuggestion = getClothingSuggestion(
+    temperature: calculatedTemperature,
+    isRaining: isRaining,
+    windSpeed: windSpeed,
+  );
+
+  print('Kıyafet önerisi: $clothingSuggestion');
+}
