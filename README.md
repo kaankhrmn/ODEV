@@ -1,3 +1,5 @@
+*SICAKLIK İÇİN*
+
 Geçen yılın hava durumunu çektiğimiz site
 https://www.visualcrossing.com/weather-history/     ya da OpenweatherMap sen hangisini kullanırsan.
 
@@ -29,6 +31,21 @@ Nem, sıcaklık üzerinde %40 etkili.
 Rüzgar hızı %20 etkili.
 Basınç da %20 etkili.
 Bu veriler, geçen yılın aynı gününe ait sıcaklık verisiyle birleştiriliyor.
+
+
+-----------------------------------------------------------------------------------------------
+*KIYAFET İÇİN*
+Özetle:
+
+Rüzgar Hızı: Diğer algoritmadan alındı (yani API'den alınan verilerden bir kısmı).
+Sıcaklık: Önceki algoritmalardan hesaplanan sıcaklık değeri kullanıldı.
+Yağmur: API'den çekilen yağmur durumu kullanıldı.
+Bu şekilde, kıyafet önerisi algoritmasında sadece sıcaklık ve yağmur verilerini kullanarak tavsiyelerde bulundum. Rüzgar ise diğer algoritmadan alındı.
+
+Şu durumda:
+
+Sıcaklık ve Rüzgar: Diğer algoritmadan alınıp kullanılabilir.
+Yağmur: Yalnızca API'den alınıp kıyafet önerisinde dikkate alındı.
 
 Geçen Yılın Verisi:
 
