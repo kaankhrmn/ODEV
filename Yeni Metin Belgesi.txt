@@ -1,0 +1,91 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+const String apiKey = 'YOUR_API_KEY'; // API anahtarınızı buraya ekleyin.
+const String city = 'Balikesir';
+const String currentWeatherUrl = 'https://api.openweathermap.org/data/2.5/weather';
+const String historicalWeatherUrl = 'https://api.openweathermap.org/data/2.5/onecall/timemachine';
+
+/// Balıkesir için hava durumu tahmini uygulaması.
+Future<void> main() async {
+  try {
+    // API'den bugünün nem, rüzgar hızı, basınç gibi bilgileri al.
+    final weatherData = await fetchCurrentWeather();
+    // API'den geçen yılın bugünkü sıcaklık bilgisini al.
+    final double lastYearTemp = await fetchLastYearTemperature();
+
+    // Bugünün sıcaklık tahmini.
+    final double calculatedTemperature = calculateTemperature(
+      currentHumidity: weatherData['humidity'],
+      currentWindSpeed: weatherData['windSpeed'],
+      currentPressure: weatherData['pressure'],
+      lastYearTemp: lastYearTemp,
+    );
+
+    print('Balıkesir için tahmini sıcaklık: $calculatedTemperature°C');
+  } catch (e) {
+    print('Bir hata oluştu: $e');
+  }
+}
+
+/// Mevcut hava durumu verilerini çeker (nem, rüzgar hızı, basınç vb.).
+Future<Map<String, double>> fetchCurrentWeather() async {
+  final response = await http.get(Uri.parse('$currentWeatherUrl?q=$city&appid=$apiKey&units=metric'));
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    final double humidity = data['main']['humidity']; // Nem oranı
+    final double windSpeed = data['wind']['speed']; // Rüzgar hızı
+    final double pressure = data['main']['pressure']; // Hava basıncı
+    return {
+      'humidity': humidity,
+      'windSpeed': windSpeed,
+      'pressure': pressure,
+    };
+  } else {
+    throw Exception('Hava durumu verileri alınamadı!');
+  }
+}
+
+/// Geçen yılın aynı gününe ait hava durumu verisini çeker.
+Future<double> fetchLastYearTemperature() async {
+  final now = DateTime.now();
+  final lastYear = now.subtract(Duration(days: 365));
+  final timestamp = lastYear.millisecondsSinceEpoch ~/ 1000; // UNIX zaman damgası.
+
+  final response = await http.get(Uri.parse(
+      '$historicalWeatherUrl?lat=39.6533&lon=27.8909&dt=$timestamp&appid=$apiKey&units=metric'));
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    return data['current']['temp']; // Geçen yılın sıcaklık bilgisi.
+  } else {
+    throw Exception('Geçen yılın hava durumu verisi alınamadı!');
+  }
+}
+
+/// Bugünün sıcaklık tahminini hesaplar.
+double calculateTemperature({
+  required double currentHumidity,
+  required double currentWindSpeed,
+  required double currentPressure,
+  required double lastYearTemp,
+}) {
+  // Nem, rüzgar hızı ve basınç faktörlerini kullanarak bugünün tahmini sıcaklığını hesapla.
+  // Bu faktörler üzerinde ağırlıklı bir hesaplama yapacağız.
+
+  const double humidityFactor = 0.4; // Nem oranının etkisi
+  const double windSpeedFactor = 0.2; // Rüzgar hızının etkisi
+  const double pressureFactor = 0.2; // Basıncın etkisi
+
+  // Nem oranı ve rüzgar hızı ile bir tahmin oluşturuyoruz.
+  double temperatureEstimate = (currentHumidity * humidityFactor) +
+      (currentWindSpeed * windSpeedFactor) +
+      (currentPressure * pressureFactor);
+
+  // Geçen yılın verisiyle bu tahmini sıcaklık birleştiriyoruz.
+  // Bu hesaplama için ağırlıklı bir ortalama kullanalım.
+  double weightedAverageTemperature = (temperatureEstimate + lastYearTemp) / 2;
+
+  return weightedAverageTemperature;
+}
