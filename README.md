@@ -1,5 +1,5 @@
 Geçen yılın hava durumunu çektiğimiz site
-https://www.visualcrossing.com/weather-history/
+https://www.visualcrossing.com/weather-history/     ya da OpenweatherMap sen hangisini kullanırsan.
 
 Bugüne ait nem rüzgar basıncı çektiğimiz site
 https://openweathermap.org/api
