@@ -1,3 +1,10 @@
+Geçen yılın hava durumunu çektiğimiz site
+https://www.visualcrossing.com/weather-history/
+
+Bugüne ait nem rüzgar basıncı çektiğimiz site
+https://openweathermap.org/api
+
+
 Bugün için sıcaklık verisini çekmek yerine, diğer hava durumu faktörlerini (nem, rüzgar hızı, basınç gibi) API'den alıp, bu verileri kullanarak tahmini bir sıcaklık değeri oluşturacağız. Bu değeri de geçen yılın aynı gününe ait sıcaklıkla işlem yaparak bugünün sıcaklık tahminini elde edeceğiz.
 
 Adımlar:
